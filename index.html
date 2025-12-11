@@ -1,0 +1,270 @@
+import React, { useState } from 'react';
+import { Trophy, BookOpen, Atom, Droplet, Flame, Battery, Beaker } from 'lucide-react';
+
+const ChemQuest = () => {
+  const [lvl, setLvl] = useState(null);
+  const [qi, setQi] = useState(0);
+  const [sc, setSc] = useState(0);
+  const [ans, setAns] = useState([]);
+  const [sh, setSh] = useState(false);
+  const [sel, setSel] = useState(null);
+
+  const levels = [
+    {n:"Periodic Table", i:BookOpen, c:"from-blue-500 to-cyan-500"},
+    {n:"Chemical Bonding", i:Atom, c:"from-purple-500 to-pink-500"},
+    {n:"Acids & Bases", i:Droplet, c:"from-green-500 to-emerald-500"},
+    {n:"Thermodynamics", i:Flame, c:"from-red-500 to-pink-500"},
+    {n:"Electrochemistry", i:Battery, c:"from-indigo-500 to-blue-500"},
+    {n:"Organic Chemistry", i:Beaker, c:"from-green-500 to-lime-500"}
+  ];
+
+  const questions = [
+    [
+      {q:"What is the atomic number of Carbon?", o:["5","6","7","8"], a:1, d:0, x:"Carbon has 6 protons, giving it atomic number 6. It's the foundation of all organic chemistry and life on Earth."},
+      {q:"Which group contains noble gases?", o:["Group 1","Group 17","Group 18","Group 2"], a:2, d:0, x:"Noble gases are in Group 18 (far right). They have full valence shells, making them extremely stable and unreactive."},
+      {q:"Which element is most electronegative?", o:["Oxygen","Fluorine","Chlorine","Nitrogen"], a:1, d:1, x:"Fluorine (4.0) is the most electronegative element due to its small atomic size and strong nuclear charge pulling electrons."},
+      {q:"What element begins Period 4?", o:["Potassium","Calcium","Scandium","Sodium"], a:0, d:0, x:"Potassium (K, atomic #19) is the first element in Period 4, an alkali metal with 1 valence electron."},
+      {q:"Which has the largest atomic radius?", o:["Lithium","Sodium","Potassium","Rubidium"], a:3, d:1, x:"Rubidium has the largest radius. Atomic size increases as you move down a group due to additional electron shells."},
+      {q:"What is the second most abundant element in Earth's crust?", o:["Oxygen","Silicon","Aluminum","Iron"], a:1, d:1, x:"Silicon makes up about 27% of Earth's crust, second only to oxygen at 46%. Essential for minerals and semiconductors."},
+      {q:"Which element has the highest first ionization energy?", o:["Helium","Neon","Fluorine","Nitrogen"], a:0, d:2, x:"Helium requires the most energy (2372 kJ/mol) to remove an electron due to its stable, complete 1s² configuration."},
+      {q:"What is the only liquid non-metal at room temperature?", o:["Mercury","Bromine","Chlorine","Iodine"], a:1, d:1, x:"Bromine is the only non-metal that exists as a liquid at room temperature (mercury is a metal)."},
+      {q:"Which family does Magnesium belong to?", o:["Alkali metals","Alkaline earth","Halogens","Transition"], a:1, d:0, x:"Magnesium is in Group 2, the alkaline earth metals, characterized by 2 valence electrons and +2 oxidation state."},
+      {q:"What does the electron configuration [Ar]3d¹⁰4s²4p⁵ represent?", o:["Bromine","Chlorine","Iodine","Selenium"], a:0, d:2, x:"This is the electron configuration for Bromine (Br), element 35, a halogen with 7 valence electrons."}
+    ],
+    [
+      {q:"What type of bond forms between Sodium and Chlorine?", o:["Covalent","Ionic","Metallic","Hydrogen"], a:1, d:0, x:"Sodium transfers an electron to chlorine, forming an ionic bond through electrostatic attraction between Na⁺ and Cl⁻."},
+      {q:"How many electrons does Carbon share in CO₂?", o:["2","4","6","8"], a:1, d:1, x:"Carbon forms two double bonds (sharing 4 electrons total) with two oxygen atoms in carbon dioxide."},
+      {q:"What is the molecular geometry of water (H₂O)?", o:["Linear","Bent","Trigonal planar","Tetrahedral"], a:1, d:1, x:"Water has bent geometry (~104.5°) due to two lone pairs on oxygen repelling the bonding pairs."},
+      {q:"Which type of bond is strongest?", o:["Single bond","Double bond","Triple bond","All equal"], a:2, d:0, x:"Triple bonds are strongest because they share three electron pairs, requiring the most energy to break."},
+      {q:"What hybridization does Carbon have in methane (CH₄)?", o:["sp","sp²","sp³","sp³d"], a:2, d:2, x:"Carbon in CH₄ is sp³ hybridized, forming four equivalent bonds in tetrahedral geometry with 109.5° angles."},
+      {q:"Which molecule is nonpolar despite having polar bonds?", o:["H₂O","CO₂","NH₃","HCl"], a:1, d:1, x:"CO₂ is linear and symmetrical, so the two polar C=O bonds cancel out, making the molecule nonpolar overall."},
+      {q:"What causes hydrogen bonding?", o:["H-C bonds","H bonded to F/O/N","H-H bonds","H-Cl bonds"], a:1, d:0, x:"Hydrogen bonds form when H is bonded to highly electronegative F, O, or N atoms, creating strong dipole interactions."},
+      {q:"How many sigma (σ) bonds are in ethene (C₂H₄)?", o:["4","5","6","7"], a:1, d:2, x:"Ethene has 5 sigma bonds: 1 C-C single bond and 4 C-H bonds. The C=C also includes 1 pi (π) bond."},
+      {q:"What is the bond order of O₂?", o:["1","1.5","2","3"], a:2, d:1, x:"O₂ has a double bond (bond order = 2). Molecular orbital theory explains its paramagnetic properties."},
+      {q:"Which type of solid has delocalized electrons?", o:["Ionic","Molecular","Metallic","Network covalent"], a:2, d:0, x:"Metallic solids have a 'sea of electrons' that are delocalized across the entire crystal lattice, allowing conductivity."}
+    ],
+    [
+      {q:"What is the pH of neutral water at 25°C?", o:["0","7","14","1"], a:1, d:0, x:"Pure water at 25°C has pH 7, with equal [H⁺] and [OH⁻] concentrations of 10⁻⁷ M."},
+      {q:"What is a Brønsted-Lowry acid?", o:["Electron donor","Electron acceptor","Proton donor","Proton acceptor"], a:2, d:1, x:"A Brønsted-Lowry acid donates protons (H⁺), while bases accept protons in chemical reactions."},
+      {q:"What is the conjugate base of HCl?", o:["Cl⁻","H⁺","OH⁻","Cl₂"], a:0, d:0, x:"When HCl donates a proton (H⁺), it becomes Cl⁻, which is its conjugate base."},
+      {q:"Which is the strongest acid among these?", o:["HCl","HF","HBr","HI"], a:3, d:1, x:"HI is the strongest acid because the large iodine atom best stabilizes the negative charge after losing H⁺."},
+      {q:"If a solution has pH 3, what is its pOH?", o:["3","7","11","14"], a:2, d:1, x:"pH + pOH = 14 at 25°C, so if pH = 3, then pOH = 14 - 3 = 11."},
+      {q:"What happens in a buffer solution?", o:["pH changes rapidly","pH resists change","pH becomes 7","pH becomes 0"], a:1, d:0, x:"Buffers resist pH changes by neutralizing added acids or bases through equilibrium shifts between weak acid/base pairs."},
+      {q:"What does Ka represent for a weak acid?", o:["Dissociation constant","Equilibrium constant","Ionization constant","All of these"], a:3, d:1, x:"Ka is the acid dissociation/ionization constant, which is a type of equilibrium constant specific to acids."},
+      {q:"Which indicator turns pink in basic solutions?", o:["Litmus","Methyl orange","Phenolphthalein","Bromothymol blue"], a:2, d:0, x:"Phenolphthalein is colorless in acidic solutions and turns pink/magenta in basic solutions (pH > 8.2)."},
+      {q:"What is the pH of 0.01 M HCl solution?", o:["1","2","3","12"], a:1, d:2, x:"HCl is a strong acid that fully dissociates, so pH = -log[H⁺] = -log(0.01) = -log(10⁻²) = 2."},
+      {q:"Which species is amphoteric?", o:["HCl","NaOH","H₂O","NaCl"], a:2, d:1, x:"Water is amphoteric, meaning it can act as both an acid (donating H⁺) and a base (accepting H⁺)."}
+    ],
+    [
+      {q:"What is the First Law of Thermodynamics?", o:["Entropy increases","Energy is conserved","Spontaneity rule","Heat flow direction"], a:1, d:0, x:"The First Law states that energy cannot be created or destroyed, only converted: ΔU = q + w."},
+      {q:"What does ΔH < 0 indicate?", o:["Endothermic","Exothermic","No heat change","Equilibrium"], a:1, d:0, x:"Negative ΔH means the system releases heat to surroundings, making the reaction exothermic."},
+      {q:"What is entropy?", o:["Heat content","Disorder measure","Total energy","Temperature"], a:1, d:1, x:"Entropy (S) measures the disorder or randomness of a system's molecular arrangements."},
+      {q:"What value of ΔG indicates a spontaneous reaction?", o:["Positive","Negative","Zero","Undefined"], a:1, d:1, x:"Spontaneous reactions have ΔG < 0, meaning they release free energy and proceed forward naturally."},
+      {q:"What is the Gibbs free energy equation?", o:["ΔG = ΔH - TΔS","ΔG = ΔH + TΔS","ΔG = TΔS - ΔH","ΔG = ΔH/T"], a:0, d:2, x:"The Gibbs equation ΔG = ΔH - TΔS relates enthalpy, entropy, and temperature to spontaneity."},
+      {q:"What are standard conditions defined as?", o:["0°C, 1 atm","25°C, 1 atm","100°C, 1 bar","25°C, 1 bar"], a:3, d:1, x:"Standard conditions are now defined as 25°C (298 K) and 1 bar pressure for thermodynamic measurements."},
+      {q:"What happens to entropy when ice melts?", o:["Decreases","Increases","No change","Becomes zero"], a:1, d:0, x:"Entropy increases when ice melts because liquid water molecules have more freedom and disorder than solid ice."},
+      {q:"What is an endergonic reaction?", o:["ΔG < 0","ΔG > 0","ΔG = 0","ΔH < 0"], a:1, d:1, x:"Endergonic reactions have ΔG > 0, requiring input of free energy and are non-spontaneous."},
+      {q:"What does the Third Law of Thermodynamics state?", o:["Energy conserved","Entropy at 0K is zero","Heat flows hot to cold","ΔG determines spontaneity"], a:1, d:2, x:"The Third Law states that a perfect crystal at absolute zero (0 K) has an entropy of exactly zero."},
+      {q:"Which process is always spontaneous?", o:["ΔH<0, ΔS<0","ΔH<0, ΔS>0","ΔH>0, ΔS<0","Depends on T"], a:1, d:2, x:"When ΔH < 0 and ΔS > 0, both factors favor spontaneity, so ΔG is always negative at all temperatures."}
+    ],
+    [
+      {q:"What is oxidation?", o:["Gain electrons","Lose electrons","Gain protons","Lose neutrons"], a:1, d:0, x:"Oxidation is the loss of electrons, often remembered by 'OIL' (Oxidation Is Loss)."},
+      {q:"What occurs at the cathode?", o:["Oxidation","Reduction","Both","Neither"], a:1, d:1, x:"Reduction occurs at the cathode where electrons are gained. Remember 'RED CAT' (REDuction at CAThode)."},
+      {q:"What is the standard hydrogen electrode potential?", o:["-1 V","0 V","+1 V","+2 V"], a:1, d:1, x:"The standard hydrogen electrode (SHE) is defined as exactly 0.00 V and serves as the reference point."},
+      {q:"In a galvanic cell, electrons flow from where?", o:["Anode to cathode","Cathode to anode","No direction","Both directions"], a:0, d:0, x:"Electrons flow from anode (oxidation site) to cathode (reduction site) through the external circuit."},
+      {q:"What is the Nernst equation used for?", o:["pH calculation","Cell potential","Rate constant","Equilibrium"], a:1, d:2, x:"The Nernst equation calculates cell potential under non-standard conditions: E = E° - (RT/nF)lnQ."},
+      {q:"What is electrolysis?", o:["Spontaneous process","Non-spontaneous forced reaction","Equilibrium state","Combustion"], a:1, d:1, x:"Electrolysis uses electrical energy to drive non-spontaneous redox reactions (ΔG > 0)."},
+      {q:"Which metal is most easily oxidized?", o:["Gold","Lithium","Copper","Silver"], a:1, d:1, x:"Lithium has the most negative reduction potential (-3.04 V), making it most easily oxidized."},
+      {q:"What is Faraday's constant?", o:["Charge per mole of electrons","Gas constant","Avogadro's number","Planck's constant"], a:0, d:2, x:"Faraday's constant (F = 96,485 C/mol) is the electrical charge carried by one mole of electrons."},
+      {q:"What prevents corrosion in galvanization?", o:["Painting","Zinc coating","Plastic wrap","Oil layer"], a:1, d:0, x:"Galvanization coats iron with zinc, which oxidizes preferentially, protecting the underlying iron."},
+      {q:"What is a salt bridge's function?", o:["Conduct electrons","Maintain electrical neutrality","Speed up reaction","Measure voltage"], a:1, d:1, x:"Salt bridges maintain electrical neutrality by allowing ion flow between half-cells without mixing solutions."}
+    ],
+    [
+      {q:"What defines organic chemistry?", o:["Metal compounds","Carbon compounds","Ionic compounds","Noble gases"], a:1, d:0, x:"Organic chemistry studies carbon-containing compounds, especially those with carbon-hydrogen bonds."},
+      {q:"What is a functional group?", o:["Main carbon chain","Reactive atom group","Benzene ring","Alkane structure"], a:1, d:0, x:"Functional groups are specific arrangements of atoms that determine a molecule's chemical properties and reactivity."},
+      {q:"What suffix indicates an alcohol?", o:["-ane","-ene","-ol","-al"], a:2, d:1, x:"Alcohols containing -OH groups use the suffix '-ol' (examples: methanol, ethanol, propanol)."},
+      {q:"What is the general formula for alkanes?", o:["CₙH₂ₙ","CₙH₂ₙ₊₂","CₙH₂ₙ₋₂","CₙHₙ"], a:1, d:1, x:"Alkanes (saturated hydrocarbons) follow the formula CₙH₂ₙ₊₂, having only single bonds."},
+      {q:"What type of reaction adds H₂ across a double bond?", o:["Substitution","Elimination","Hydrogenation","Oxidation"], a:2, d:1, x:"Hydrogenation adds hydrogen molecules across C=C double bonds, converting alkenes to alkanes."},
+      {q:"What is benzene's molecular formula?", o:["C₆H₆","C₆H₁₂","C₅H₆","C₇H₈"], a:0, d:0, x:"Benzene (C₆H₆) is a cyclic aromatic compound with alternating double bonds forming a stable ring."},
+      {q:"What functional group do carboxylic acids contain?", o:["-OH only","-COOH","-CHO","-CO-"], a:1, d:0, x:"Carboxylic acids contain the -COOH group, combining a carbonyl (C=O) and hydroxyl (-OH) group."},
+      {q:"What is an isomer?", o:["Same formula, different structure","Different formula","Same everything","Different elements"], a:0, d:1, x:"Isomers have identical molecular formulas but different structural arrangements of atoms."},
+      {q:"What type of reaction is CH₃Cl + OH⁻ → CH₃OH + Cl⁻?", o:["Addition","Elimination","Substitution","Rearrangement"], a:2, d:2, x:"This is nucleophilic substitution where the OH⁻ nucleophile replaces Cl⁻ on the carbon atom."},
+      {q:"What hybridization does carbon have in ethyne (C₂H₂)?", o:["sp","sp²","sp³","sp³d"], a:0, d:2, x:"Carbon in alkynes like ethyne is sp hybridized, forming linear geometry with a triple bond."}
+    ]
+  ];
+
+  const points = [10, 20, 30];
+  const diffNames = ["Easy", "Medium", "Hard"];
+  const diffColors = ["bg-green-500", "bg-yellow-500", "bg-red-500"];
+  const currentQ = lvl !== null ? questions[lvl][qi] : null;
+
+  const handleAnswer = (i) => {
+    if (sh) return;
+    setSel(i);
+    const correct = i === currentQ.a;
+    const pts = points[currentQ.d];
+    if (correct) setSc(sc + pts);
+    setAns([...ans, {cor: correct, pts: correct ? pts : 0, diff: currentQ.d}]);
+    setSh(true);
+  };
+
+  const nextQuestion = () => {
+    if (qi < 9) {
+      setQi(qi + 1);
+      setSh(false);
+      setSel(null);
+    } else {
+      setQi(10);
+    }
+  };
+
+  const startLevel = (i) => {
+    setLvl(i);
+    setQi(0);
+    setSc(0);
+    setAns([]);
+    setSh(false);
+    setSel(null);
+  };
+
+  if (lvl !== null && qi === 10) {
+    const total = ans.reduce((s, a) => s + a.pts, 0);
+    const max = 200;
+    const pct = ((total / max) * 100).toFixed(1);
+    const correct = ans.filter(a => a.cor).length;
+    const accuracy = ((correct / 10) * 100).toFixed(0);
+
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 p-4 sm:p-8">
+        <div className="max-w-2xl mx-auto bg-white rounded-3xl shadow-2xl p-6 sm:p-8">
+          <div className="text-center mb-8">
+            <Trophy className="w-20 h-20 sm:w-24 sm:h-24 mx-auto text-yellow-500 mb-4"/>
+            <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 mb-2">Level Complete!</h1>
+            <p className="text-lg sm:text-xl text-gray-600">{levels[lvl].n}</p>
+          </div>
+          <div className="grid grid-cols-2 gap-4 sm:gap-6 mb-8">
+            <div className="bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl p-4 sm:p-6 text-white">
+              <div className="text-xs sm:text-sm font-medium opacity-90">Total Score</div>
+              <div className="text-3xl sm:text-4xl font-bold">{total}</div>
+              <div className="text-xs sm:text-sm opacity-75">out of {max}</div>
+            </div>
+            <div className="bg-gradient-to-br from-green-500 to-emerald-500 rounded-2xl p-4 sm:p-6 text-white">
+              <div className="text-xs sm:text-sm font-medium opacity-90">Accuracy</div>
+              <div className="text-3xl sm:text-4xl font-bold">{accuracy}%</div>
+              <div className="text-xs sm:text-sm opacity-75">{correct}/10 correct</div>
+            </div>
+          </div>
+          <div className="mb-8">
+            <div className="flex justify-between items-center mb-3">
+              <span className="text-sm font-semibold text-gray-700">Completion</span>
+              <span className="text-sm font-bold text-purple-600">{pct}%</span>
+            </div>
+            <div className="w-full h-4 bg-gray-200 rounded-full overflow-hidden">
+              <div className="h-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-1000" style={{width: `${pct}%`}}/>
+            </div>
+          </div>
+          <div className="mb-8">
+            <h3 className="text-lg font-bold text-gray-800 mb-3">Score Breakdown</h3>
+            <div className="space-y-2">
+              {[0, 1, 2].map(d => {
+                const count = ans.filter(a => a.diff === d && a.cor).length;
+                const totQ = ans.filter(a => a.diff === d).length;
+                return (
+                  <div key={d} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <span className={`px-2 py-1 rounded text-white text-xs font-bold ${diffColors[d]}`}>{diffNames[d]}</span>
+                      <span className="text-sm text-gray-600">{count}/{totQ} correct</span>
+                    </div>
+                    <span className="font-bold text-gray-700">{count * points[d]} pts</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          <button onClick={() => setLvl(null)} className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-4 rounded-xl font-bold text-lg hover:shadow-lg transform hover:scale-105 transition-all">Back to Levels</button>
+        </div>
+      </div>
+    );
+  }
+
+  if (lvl !== null) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 p-4 sm:p-8">
+        <div className="max-w-3xl mx-auto">
+          <div className="bg-white rounded-t-3xl p-4 sm:p-6 shadow-xl">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+              <div>
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-800">{levels[lvl].n}</h2>
+                <p className="text-sm text-gray-600">Question {qi + 1} of 10</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className={`px-3 py-1 rounded-lg ${diffColors[currentQ.d]} text-white font-bold text-sm`}>{diffNames[currentQ.d]} • {points[currentQ.d]}pts</div>
+                <div className="text-right">
+                  <div className="text-2xl font-bold text-purple-600">{sc}</div>
+                  <div className="text-xs text-gray-500">Score</div>
+                </div>
+              </div>
+            </div>
+            <div className="w-full h-2 bg-gray-200 rounded-full mb-6">
+              <div className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full transition-all" style={{width: `${((qi + 1) / 10) * 100}%`}}/>
+            </div>
+            <div className="mb-6">
+              <p className="text-lg sm:text-xl font-semibold text-gray-800">{currentQ.q}</p>
+            </div>
+            <div className="space-y-3 mb-6">
+              {currentQ.o.map((opt, i) => (
+                <button key={i} onClick={() => handleAnswer(i)} disabled={sh} className={`w-full p-4 rounded-xl text-left font-medium transition-all ${sh ? i === currentQ.a ? 'bg-green-500 text-white shadow-lg' : i === sel ? 'bg-red-500 text-white' : 'bg-gray-100 text-gray-400' : 'bg-gray-100 hover:bg-purple-100 text-gray-800 hover:shadow-md'}`}>
+                  <span className="font-bold mr-2">{String.fromCharCode(65 + i)}.</span>{opt}
+                </button>
+              ))}
+            </div>
+            {sh && (
+              <div className={`p-4 rounded-xl mb-4 ${sel === currentQ.a ? 'bg-green-50 border-2 border-green-500' : 'bg-red-50 border-2 border-red-500'}`}>
+                <p className={`font-bold mb-2 ${sel === currentQ.a ? 'text-green-700' : 'text-red-700'}`}>{sel === currentQ.a ? '✓ Correct!' : '✗ Incorrect'}</p>
+                <p className="text-sm text-gray-700">{currentQ.x}</p>
+              </div>
+            )}
+          </div>
+          <div className="bg-white rounded-b-3xl p-4 sm:p-6 shadow-xl border-t">
+            {sh && (
+              <button onClick={nextQuestion} className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-4 rounded-xl font-bold text-lg hover:shadow-lg transform hover:scale-105 transition-all">{qi < 9 ? 'Next Question →' : 'See Results'}</button>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 p-4 sm:p-8">
+      <div className="max-w-6xl mx-auto">
+        <div className="text-center mb-8 sm:mb-12">
+          <h1 className="text-4xl sm:text-6xl font-bold text-white mb-4 drop-shadow-lg">ChemQuest Enhanced</h1>
+          <p className="text-lg sm:text-xl text-purple-200">Master chemistry through 6 exciting levels!</p>
+          <p className="text-sm sm:text-base text-purple-300 mt-2">10 questions per level • 3 difficulty tiers • 200 points max</p>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          {levels.map((l, i) => {
+            const Icon = l.i;
+            return (
+              <button key={i} onClick={() => startLevel(i)} className="group bg-white rounded-2xl p-6 shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300">
+                <div className={`w-16 h-16 rounded-xl bg-gradient-to-br ${l.c} flex items-center justify-center mb-4 group-hover:rotate-12 transition-transform`}>
+                  <Icon className="w-8 h-8 text-white"/>
+                </div>
+                <h3 className="text-xl font-bold text-gray-800 mb-2">{l.n}</h3>
+                <p className="text-sm text-gray-600 mb-3">10 Questions</p>
+                <div className="flex gap-2">
+                  {[0, 1, 2].map(d => (
+                    <span key={d} className={`px-2 py-1 rounded text-white text-xs font-bold ${diffColors[d]}`}>{diffNames[d]}</span>
+                  ))}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ChemQuest;
